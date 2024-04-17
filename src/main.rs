@@ -7,6 +7,7 @@ use axum::{
     routing::get,
     Router,
 };
+use axum_extra::extract::cookie::{Cookie, SameSite};
 use state::AppState;
 
 #[tokio::main]
@@ -106,12 +107,21 @@ async fn google_callback(
     tracing::info!("email={} name={}", response.email, response.given_name);
 
     // TODO: Find or create user in database
+
     // TODO: Return a JWT token in a cookie for the client
+    let token = format!("mock-jwt-token-{}", response.email);
+    let cookie = Cookie::build(("token", token))
+        .path("/")
+        .max_age(time::Duration::days(1))
+        .same_site(SameSite::Lax)
+        .http_only(true)
+        .build();
 
     // Redirect to index page
     axum::http::Response::builder()
         .status(axum::http::StatusCode::TEMPORARY_REDIRECT)
         .header("Location", "/")
+        .header(axum::http::header::SET_COOKIE, cookie.to_string())
         .body(axum::body::Body::empty())
         .unwrap()
 }
