@@ -1,5 +1,6 @@
 pub mod config;
 pub mod model;
+pub mod repositories;
 pub mod routes;
 pub mod state;
 
