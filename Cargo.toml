@@ -17,3 +17,4 @@ dotenv = "0.15.0"
 url = "2.5.0"
 axum-extra = { version = "0.9.3", features = ["cookie"] }
 time = "0.3.36"
+uuid = { version = "1.8.0", features = ["v4"] }
