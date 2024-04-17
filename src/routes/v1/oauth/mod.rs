@@ -1,7 +1,4 @@
-use crate::{
-    model::user::{AuthProvider, User},
-    state::AppState,
-};
+use crate::{model::user::AuthProvider, state::AppState};
 use axum::{
     extract::{Query, State},
     response::Response,
@@ -79,13 +76,26 @@ pub async fn google_callback(
 
     tracing::info!("email={} name={}", response.email, response.given_name);
 
-    // TODO: Find or create user in database
-    let user = User {
-        id: 1,
-        public_id: uuid::Uuid::new_v4().to_string(),
-        email: response.email,
-        name: response.given_name,
-        auth_provider: AuthProvider::Google,
+    let potential_user = state.user_repo.find_by_email(&response.email).await;
+    let user = match potential_user {
+        Some(user) => {
+            // User exists
+            tracing::info!("user exists: {:?}", user);
+            user
+        }
+        None => {
+            // User does not exist
+            tracing::info!("user does not exist, creating user");
+            state
+                .user_repo
+                .create(
+                    &uuid::Uuid::new_v4().to_string(),
+                    &response.email,
+                    &response.given_name,
+                    AuthProvider::Google,
+                )
+                .await
+        }
     };
 
     // TODO: Return a JWT token in a cookie for the client

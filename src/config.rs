@@ -7,6 +7,7 @@ use std::{
 pub struct Config {
     pub host: String,
     pub port: String,
+    pub database_url: String,
     pub google_client_id: String,
     pub google_client_secret: String,
     pub google_redirect_uri: String,
@@ -34,6 +35,8 @@ impl Config {
     pub fn from_env() -> Result<Config, ConfigError> {
         let host = std::env::var("HOST").map_err(|_| ConfigError::MissingEnvVar("HOST".into()))?;
         let port = std::env::var("PORT").map_err(|_| ConfigError::MissingEnvVar("PORT".into()))?;
+        let database_url = std::env::var("DATABASE_URL")
+            .map_err(|_| ConfigError::MissingEnvVar("DATABASE_URL".into()))?;
         let google_client_id = std::env::var("GOOGLE_CLIENT_ID")
             .map_err(|_| ConfigError::MissingEnvVar("GOOGLE_CLIENT_ID".into()))?;
         let google_client_secret = std::env::var("GOOGLE_CLIENT_SECRET")
@@ -53,6 +56,7 @@ impl Config {
         Ok(Config {
             host,
             port,
+            database_url,
             google_client_id,
             google_client_secret,
             google_redirect_uri,

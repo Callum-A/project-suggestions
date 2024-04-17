@@ -5,10 +5,12 @@ pub mod routes;
 pub mod state;
 
 use axum::{routing::get, Router};
+use sqlx::postgres::PgPoolOptions;
 use state::AppState;
 
 use crate::{
     config::Config,
+    repositories::user::UserRepository,
     routes::v1::{
         debug::hello_world_v1,
         oauth::{google_authorize, google_callback},
@@ -22,7 +24,13 @@ async fn main() {
         .with_max_level(tracing::Level::DEBUG)
         .init();
     let config = Config::from_env().unwrap();
-    let app_state = AppState { config };
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect(&config.database_url)
+        .await
+        .unwrap();
+    let user_repo = UserRepository::new(pool.clone());
+    let app_state = AppState { config, user_repo };
 
     let api_v1_router = Router::new()
         .route("/", get(hello_world_v1))
