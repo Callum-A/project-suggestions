@@ -4,7 +4,10 @@ pub mod repositories;
 pub mod routes;
 pub mod state;
 
-use axum::{routing::get, Router};
+use axum::{
+    routing::{delete, get, post, put},
+    Router,
+};
 use sqlx::postgres::PgPoolOptions;
 use state::AppState;
 
@@ -14,6 +17,10 @@ use crate::{
     routes::v1::{
         debug::hello_world_v1,
         oauth::{google_authorize, google_callback},
+        project::{
+            create_project, delete_project_by_public_id, get_project_by_public_id, get_projects,
+            update_project_by_public_id,
+        },
     },
 };
 
@@ -37,7 +44,14 @@ async fn main() {
         project_repo,
     };
 
+    let project_v1_router = Router::new()
+        .route("/", post(create_project))
+        .route("/", get(get_projects))
+        .route("/:public_id", get(get_project_by_public_id))
+        .route("/:public_id", delete(delete_project_by_public_id))
+        .route("/:public_id", put(update_project_by_public_id));
     let api_v1_router = Router::new()
+        .nest("/project", project_v1_router)
         .route("/", get(hello_world_v1))
         .route("/oauth/authorize/google", get(google_authorize))
         .route("/oauth/callback/google", get(google_callback));
