@@ -1,9 +1,11 @@
 use axum::{
     extract::{Path, Query, State},
+    http::status::StatusCode,
+    response::Response,
     Json,
 };
 
-use crate::{model::project::SerializableProject, state::AppState};
+use crate::{model::project::SerializableProject, state::AppState, util::build_response};
 
 const DEFAULT_PER_PAGE: i64 = 10;
 
@@ -50,12 +52,13 @@ pub async fn get_projects(
 pub async fn get_project_by_public_id(
     State(state): State<AppState>,
     Path(public_id): Path<String>,
-) -> Json<Option<SerializableProject>> {
-    // TODO: 404 if project not found
+) -> Response {
     let project = state.project_repo.find_by_public_id(&public_id).await;
     match project {
-        Some(project) => Json(Some(project.into())),
-        None => Json(None),
+        Some(project) => {
+            build_response(StatusCode::OK, Json::<SerializableProject>(project.into()))
+        }
+        None => build_response(StatusCode::NOT_FOUND, "Not Found"),
     }
 }
 
@@ -63,8 +66,8 @@ pub async fn update_project_by_public_id(
     State(state): State<AppState>,
     Path(public_id): Path<String>,
     Json(payload): Json<UpdateProjectDTO>,
-) -> Json<Option<SerializableProject>> {
-    // TODO: 404 if project not found, only owner can update
+) -> Response {
+    // TODO: only owner can update
     let project = state.project_repo.find_by_public_id(&public_id).await;
     match project {
         Some(mut project) => {
@@ -74,24 +77,25 @@ pub async fn update_project_by_public_id(
             if let Some(description) = payload.description {
                 project.description = description;
             }
-            let updated_project = state.project_repo.update(&project).await;
-            Json(Some(updated_project.into()))
+            let updated_project: SerializableProject =
+                state.project_repo.update(&project).await.into();
+            build_response(StatusCode::OK, Json(updated_project))
         }
-        None => Json(None),
+        None => build_response(StatusCode::NOT_FOUND, "Not Found"),
     }
 }
 
 pub async fn delete_project_by_public_id(
     State(state): State<AppState>,
     Path(public_id): Path<String>,
-) -> Json<Option<SerializableProject>> {
-    // TODO: 404 if project not found, only owner can delete
+) -> Response {
+    // TODO: only owner can delete
     let project = state.project_repo.find_by_public_id(&public_id).await;
     match project {
         Some(project) => {
             state.project_repo.delete_by_public_id(&public_id).await;
-            Json(Some(project.into()))
+            build_response(StatusCode::OK, Json::<SerializableProject>(project.into()))
         }
-        None => Json(None),
+        None => build_response(StatusCode::NOT_FOUND, "Not Found"),
     }
 }

@@ -3,6 +3,7 @@ pub mod model;
 pub mod repositories;
 pub mod routes;
 pub mod state;
+pub mod util;
 
 use axum::{
     routing::{delete, get, post, put},
