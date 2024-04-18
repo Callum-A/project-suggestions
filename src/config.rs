@@ -14,6 +14,7 @@ pub struct Config {
     pub google_scopes: Vec<String>,
     pub google_token_url: String,
     pub google_user_info_url: String,
+    pub jwt_secret: String,
 }
 
 #[derive(Debug)]
@@ -52,6 +53,8 @@ impl Config {
             .map_err(|_| ConfigError::MissingEnvVar("GOOGLE_TOKEN_URL".into()))?;
         let google_user_info_url = std::env::var("GOOGLE_USER_INFO_URL")
             .map_err(|_| ConfigError::MissingEnvVar("GOOGLE_USER_INFO_URL".into()))?;
+        let jwt_secret = std::env::var("JWT_SECRET")
+            .map_err(|_| ConfigError::MissingEnvVar("GOOGLE_USER_INFO_URL".into()))?;
 
         Ok(Config {
             host,
@@ -63,6 +66,7 @@ impl Config {
             google_scopes,
             google_token_url,
             google_user_info_url,
+            jwt_secret,
         })
     }
 }

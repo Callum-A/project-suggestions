@@ -1,3 +1,5 @@
+pub mod jwt;
+
 use axum::{
     http::status::StatusCode,
     response::{IntoResponse, Response},

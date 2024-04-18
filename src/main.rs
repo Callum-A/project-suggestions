@@ -1,4 +1,5 @@
 pub mod config;
+pub mod middleware;
 pub mod model;
 pub mod repositories;
 pub mod routes;
@@ -16,13 +17,14 @@ use crate::{
     config::Config,
     repositories::{project::ProjectRepository, tag::TagRepository, user::UserRepository},
     routes::v1::{
-        debug::hello_world_v1,
+        debug::{hello_world_v1, whoami},
         oauth::{google_authorize, google_callback},
         project::{
             create_project, delete_project_by_public_id, get_project_by_public_id, get_projects,
             update_project_by_public_id,
         },
     },
+    util::jwt::JWTClient,
 };
 
 #[tokio::main]
@@ -40,25 +42,43 @@ async fn main() {
     let user_repo = UserRepository::new(pool.clone());
     let project_repo = ProjectRepository::new(pool.clone());
     let tag_repo = TagRepository::new(pool.clone());
+    let jwt_client = JWTClient::new(&config.jwt_secret);
     let app_state = AppState {
         config,
         user_repo,
         project_repo,
         tag_repo,
+        jwt_client,
     };
 
+    // Project routes
     let project_v1_router = Router::new()
         .route("/", post(create_project))
         .route("/", get(get_projects))
         .route("/:public_id", get(get_project_by_public_id))
         .route("/:public_id", delete(delete_project_by_public_id))
         .route("/:public_id", put(update_project_by_public_id));
+
+    // Debug routes
+    let debug_v1_router_protected =
+        Router::new()
+            .route("/whoami", get(whoami))
+            .layer(axum::middleware::from_fn_with_state(
+                app_state.clone(),
+                middleware::authenticate,
+            ));
+    let debug_v1_router = Router::new()
+        .route("/", get(hello_world_v1))
+        .nest("/", debug_v1_router_protected);
+
+    // v1 API routes
     let api_v1_router = Router::new()
         .nest("/project", project_v1_router)
-        .route("/", get(hello_world_v1))
+        .nest("/debug", debug_v1_router)
         .route("/oauth/authorize/google", get(google_authorize))
         .route("/oauth/callback/google", get(google_callback));
 
+    // Build the full app
     let app = Router::new()
         .nest("/api/v1", api_v1_router)
         .route("/", get(root))

@@ -1,4 +1,4 @@
-use crate::{model::user::AuthProvider, state::AppState};
+use crate::{model::user::AuthProvider, state::AppState, util::jwt::JWTClaims};
 use axum::{
     extract::{Query, State},
     response::Response,
@@ -98,8 +98,7 @@ pub async fn google_callback(
         }
     };
 
-    // TODO: Return a JWT token in a cookie for the client
-    let token = format!("mock-jwt-token-{}", user.email);
+    let token = state.jwt_client.encode(JWTClaims::from(&user));
     let cookie = Cookie::build(("token", token))
         .path("/")
         .max_age(time::Duration::days(1))
