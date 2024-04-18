@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM \"tag_to_project\"\n            WHERE tag_id = $1 AND project_id = $2\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4cd7b4188640bd06e99c0448e8d2ff977b775211e211615b3708d0f675460fb1"
+}

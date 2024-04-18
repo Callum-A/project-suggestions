@@ -9,6 +9,7 @@ pub struct Project {
     pub description: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+    pub user_id: i32,
 }
 
 #[derive(Debug, Serialize)]
@@ -19,6 +20,7 @@ pub struct SerializableProject {
     pub description: String,
     pub created_at: String,
     pub updated_at: String,
+    pub user_id: i32,
 }
 
 impl Into<SerializableProject> for Project {
@@ -30,6 +32,7 @@ impl Into<SerializableProject> for Project {
             description: self.description,
             created_at: self.created_at.to_string(),
             updated_at: self.updated_at.to_string(),
+            user_id: self.user_id,
         }
     }
 }

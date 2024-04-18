@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT *\n            FROM \"project\"\n            WHERE id = $1\n            ",
+  "query": "\n            UPDATE \"project\"\n            SET title = $1, description = $2,\n            updated_at = CURRENT_TIMESTAMP\n            WHERE id = $3\n            RETURNING *\n            ",
   "describe": {
     "columns": [
       {
@@ -41,6 +41,8 @@
     ],
     "parameters": {
       "Left": [
+        "Text",
+        "Text",
         "Int4"
       ]
     },
@@ -54,5 +56,5 @@
       false
     ]
   },
-  "hash": "1679b7867ae6100bdfdccd65bc7986d5461d1674662c6400ea948352a71dc464"
+  "hash": "736a34ec61f2d6d6bb037db2207860b25257576cde93219aad932888d7669d46"
 }

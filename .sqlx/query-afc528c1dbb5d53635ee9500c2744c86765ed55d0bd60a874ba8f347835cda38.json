@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT *\n            FROM \"project\"\n            WHERE id = $1\n            ",
+  "query": "\n            SELECT *\n            FROM \"project\"\n            WHERE public_id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -41,7 +41,7 @@
     ],
     "parameters": {
       "Left": [
-        "Int4"
+        "Text"
       ]
     },
     "nullable": [
@@ -54,5 +54,5 @@
       false
     ]
   },
-  "hash": "1679b7867ae6100bdfdccd65bc7986d5461d1674662c6400ea948352a71dc464"
+  "hash": "afc528c1dbb5d53635ee9500c2744c86765ed55d0bd60a874ba8f347835cda38"
 }

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT *\n            FROM \"project\"\n            WHERE id = $1\n            ",
+  "query": "\n            INSERT INTO \"project\" (public_id, title, description)\n            VALUES ($1, $2, $3)\n            RETURNING *\n            ",
   "describe": {
     "columns": [
       {
@@ -41,7 +41,9 @@
     ],
     "parameters": {
       "Left": [
-        "Int4"
+        "Text",
+        "Text",
+        "Text"
       ]
     },
     "nullable": [
@@ -54,5 +56,5 @@
       false
     ]
   },
-  "hash": "1679b7867ae6100bdfdccd65bc7986d5461d1674662c6400ea948352a71dc464"
+  "hash": "09d80c2e45e67ec224b72d15b77f9df60a4dd056e6cb9fd527d4a745d3d944b5"
 }
