@@ -2,10 +2,14 @@ use axum::{
     extract::{Path, Query, State},
     http::status::StatusCode,
     response::Response,
-    Json,
+    Extension, Json,
 };
 
-use crate::{model::project::SerializableProject, state::AppState, util::build_response};
+use crate::{
+    model::project::SerializableProject,
+    state::AppState,
+    util::{build_response, jwt::JWTClaims},
+};
 
 const DEFAULT_PER_PAGE: i64 = 10;
 
@@ -31,13 +35,19 @@ pub struct Paginate {
 }
 
 pub async fn create_project(
+    Extension(user): Extension<JWTClaims>,
     State(state): State<AppState>,
     Json(payload): Json<CreateProjectDTO>,
 ) -> Json<SerializableProject> {
     let public_id = uuid::Uuid::new_v4().to_string();
     let project = state
         .project_repo
-        .create(&public_id, &payload.title, &payload.description)
+        .create(
+            &public_id,
+            &payload.title,
+            &payload.description,
+            user.user_id,
+        )
         .await;
     for tag in payload.tags {
         let tag = state.tag_repo.find_by_name_or_create(&tag).await;
@@ -73,14 +83,18 @@ pub async fn get_project_by_public_id(
 }
 
 pub async fn update_project_by_public_id(
+    Extension(user): Extension<JWTClaims>,
     State(state): State<AppState>,
     Path(public_id): Path<String>,
     Json(payload): Json<UpdateProjectDTO>,
 ) -> Response {
-    // TODO: only owner can update
     let project = state.project_repo.find_by_public_id(&public_id).await;
     match project {
         Some(mut project) => {
+            if user.user_id != project.user_id {
+                return build_response(StatusCode::UNAUTHORIZED, "Forbidden");
+            }
+
             if let Some(title) = payload.title {
                 project.title = title;
             }
@@ -110,13 +124,16 @@ pub async fn update_project_by_public_id(
 }
 
 pub async fn delete_project_by_public_id(
+    Extension(user): Extension<JWTClaims>,
     State(state): State<AppState>,
     Path(public_id): Path<String>,
 ) -> Response {
-    // TODO: only owner can delete
     let project = state.project_repo.find_by_public_id(&public_id).await;
     match project {
         Some(project) => {
+            if user.user_id != project.user_id {
+                return build_response(StatusCode::UNAUTHORIZED, "Forbidden");
+            }
             state.project_repo.delete_by_public_id(&public_id).await;
             build_response(StatusCode::OK, Json::<SerializableProject>(project.into()))
         }

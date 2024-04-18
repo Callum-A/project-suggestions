@@ -52,12 +52,18 @@ async fn main() {
     };
 
     // Project routes
-    let project_v1_router = Router::new()
+    let project_v1_router_protected = Router::new()
         .route("/", post(create_project))
+        .route("/:public_id", delete(delete_project_by_public_id))
+        .route("/:public_id", put(update_project_by_public_id))
+        .layer(axum::middleware::from_fn_with_state(
+            app_state.clone(),
+            middleware::authenticate,
+        ));
+    let project_v1_router = Router::new()
         .route("/", get(get_projects))
         .route("/:public_id", get(get_project_by_public_id))
-        .route("/:public_id", delete(delete_project_by_public_id))
-        .route("/:public_id", put(update_project_by_public_id));
+        .nest("/", project_v1_router_protected);
 
     // Debug routes
     let debug_v1_router_protected =

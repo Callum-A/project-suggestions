@@ -58,17 +58,24 @@ impl ProjectRepository {
         .unwrap()
     }
 
-    pub async fn create(&self, public_id: &str, title: &str, description: &str) -> Project {
+    pub async fn create(
+        &self,
+        public_id: &str,
+        title: &str,
+        description: &str,
+        user_id: i32,
+    ) -> Project {
         sqlx::query_as!(
             Project,
             r#"
-            INSERT INTO "project" (public_id, title, description)
-            VALUES ($1, $2, $3)
+            INSERT INTO "project" (public_id, title, description, user_id)
+            VALUES ($1, $2, $3, $4)
             RETURNING *
             "#,
             public_id,
             title,
-            description
+            description,
+            user_id,
         )
         .fetch_one(&self.pool)
         .await
