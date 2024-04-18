@@ -13,12 +13,15 @@ const DEFAULT_PER_PAGE: i64 = 10;
 pub struct CreateProjectDTO {
     title: String,
     description: String,
+    tags: Vec<String>,
 }
 
 #[derive(serde::Deserialize)]
 pub struct UpdateProjectDTO {
     title: Option<String>,
     description: Option<String>,
+    tags_to_add: Vec<String>,
+    tags_to_remove: Vec<String>,
 }
 
 #[derive(serde::Deserialize)]
@@ -36,6 +39,13 @@ pub async fn create_project(
         .project_repo
         .create(&public_id, &payload.title, &payload.description)
         .await;
+    for tag in payload.tags {
+        let tag = state.tag_repo.find_by_name_or_create(&tag).await;
+        state
+            .tag_repo
+            .create_tag_to_project(tag.id, project.id)
+            .await;
+    }
     Json(project.into())
 }
 
@@ -76,6 +86,20 @@ pub async fn update_project_by_public_id(
             }
             if let Some(description) = payload.description {
                 project.description = description;
+            }
+            for tag in payload.tags_to_add {
+                let tag = state.tag_repo.find_by_name_or_create(&tag).await;
+                state
+                    .tag_repo
+                    .create_tag_to_project(tag.id, project.id)
+                    .await;
+            }
+            for tag in payload.tags_to_remove {
+                let tag = state.tag_repo.find_by_name_or_create(&tag).await;
+                state
+                    .tag_repo
+                    .delete_tag_to_project(tag.id, project.id)
+                    .await;
             }
             let updated_project: SerializableProject =
                 state.project_repo.update(&project).await.into();

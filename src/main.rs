@@ -14,7 +14,7 @@ use state::AppState;
 
 use crate::{
     config::Config,
-    repositories::{project::ProjectRepository, user::UserRepository},
+    repositories::{project::ProjectRepository, tag::TagRepository, user::UserRepository},
     routes::v1::{
         debug::hello_world_v1,
         oauth::{google_authorize, google_callback},
@@ -39,10 +39,12 @@ async fn main() {
         .unwrap();
     let user_repo = UserRepository::new(pool.clone());
     let project_repo = ProjectRepository::new(pool.clone());
+    let tag_repo = TagRepository::new(pool.clone());
     let app_state = AppState {
         config,
         user_repo,
         project_repo,
+        tag_repo,
     };
 
     let project_v1_router = Router::new()
