@@ -103,7 +103,7 @@ pub async fn google_callback(
         .path("/")
         .max_age(time::Duration::days(1))
         .same_site(SameSite::Lax)
-        .http_only(true)
+        .http_only(false)
         .build();
 
     // Redirect to index page

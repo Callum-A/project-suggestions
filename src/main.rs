@@ -7,6 +7,7 @@ pub mod state;
 pub mod util;
 
 use axum::{
+    response::{IntoResponse, Response},
     routing::{delete, get, post, put},
     Router,
 };
@@ -100,6 +101,17 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn root() -> &'static str {
-    "Hello, World!"
+async fn root() -> Response {
+    let react_dev_server = std::env::var("REACT_DEV_SERVER").unwrap_or("".to_string());
+    if react_dev_server.is_empty() {
+        // TODO: Serve index.html
+        return "Hello, World!".into_response();
+    }
+
+    // Redirect to React dev server
+    axum::http::Response::builder()
+        .status(axum::http::StatusCode::TEMPORARY_REDIRECT)
+        .header("Location", react_dev_server)
+        .body(axum::body::Body::empty())
+        .unwrap()
 }
