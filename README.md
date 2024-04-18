@@ -5,7 +5,7 @@ with a list of tags for discoverability. These project suggestions will then be 
 
 ## UI Repo
 
-UI repo not yet public.
+You can find the UI code available [here](https://github.com/Callum-A/project-suggestions-ui).
 
 ## Usage
 
