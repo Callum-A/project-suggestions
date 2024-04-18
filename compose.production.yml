@@ -1,0 +1,7 @@
+services:
+  app:
+    env_file:
+      - .env.production
+    image: "project-suggestions:latest"
+    ports:
+      - "5000:5000"

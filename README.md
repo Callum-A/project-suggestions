@@ -15,7 +15,7 @@ You can find the UI code under the `ui` directory.
 
 ```bash
 # Fill in .env
-cp .env.example .env
+cp .env.example.local .env
 cargo run
 ```
 
@@ -30,9 +30,20 @@ npm start
 
 ### Docker
 
+### Local React Server
+
 ```bash
 # Fill in .env
-cp .env.example .env
+cp .env.example.local .env
 docker build -t project-suggestions .
-docker compose up
+docker compose -f compose.local.yml up
+```
+
+### Production
+
+```bash
+# Fill in .env
+cp .env.example.production .env.production
+docker build -t project-suggestions .
+docker compose -f compose.production.yml up
 ```

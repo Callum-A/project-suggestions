@@ -23,16 +23,16 @@ pub struct SerializableProject {
     pub user_id: i32,
 }
 
-impl Into<SerializableProject> for Project {
-    fn into(self) -> SerializableProject {
+impl From<Project> for SerializableProject {
+    fn from(val: Project) -> Self {
         SerializableProject {
-            id: self.id,
-            public_id: self.public_id,
-            title: self.title,
-            description: self.description,
-            created_at: self.created_at.to_string(),
-            updated_at: self.updated_at.to_string(),
-            user_id: self.user_id,
+            id: val.id,
+            public_id: val.public_id,
+            title: val.title,
+            description: val.description,
+            created_at: val.created_at.to_string(),
+            updated_at: val.updated_at.to_string(),
+            user_id: val.user_id,
         }
     }
 }

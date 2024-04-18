@@ -1,5 +1,8 @@
 /target
 .env
+.env.production
+.env.local
+/dist
 
 # UI
 ui/node_modules

@@ -13,6 +13,7 @@ use axum::{
 };
 use sqlx::postgres::PgPoolOptions;
 use state::AppState;
+use tower_http::services::ServeDir;
 
 use crate::{
     config::Config,
@@ -85,10 +86,19 @@ async fn main() {
         .route("/oauth/authorize/google", get(google_authorize))
         .route("/oauth/callback/google", get(google_callback));
 
+    // Allowing React dev server to be used
+    let react_dev_server = std::env::var("REACT_DEV_SERVER").unwrap_or("".to_string());
+    let ui_router = if react_dev_server.is_empty() {
+        Router::new().nest_service("/", ServeDir::new("dist"))
+    } else {
+        Router::new().route("/", get(root))
+    };
+
     // Build the full app
     let app = Router::new()
         .nest("/api/v1", api_v1_router)
-        .route("/", get(root))
+        .nest("/", ui_router)
+        //.route("/", get(root))
         .with_state(app_state.clone());
 
     let listener = tokio::net::TcpListener::bind(&format!(
