@@ -5,6 +5,11 @@ on:
     branches:
       - 'main'
 
+env:
+  REACT_APP_GOOGLE_CLIENT_ID: ${{ vars.REACT_APP_GOOGLE_CLIENT_ID }}
+  REACT_APP_GOOGLE_CLIENT_SECRET: ${{ vars.REACT_APP_GOOGLE_CLIENT_SECRET }}
+  REACT_APP_GOOGLE_REDIRECT_URI: ${{ vars.REACT_APP_GOOGLE_REDIRECT_URI }}
+
 jobs:
   docker-amd:
     runs-on: ubuntu-latest
