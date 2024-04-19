@@ -15,6 +15,9 @@ pub struct Config {
     pub google_token_url: String,
     pub google_user_info_url: String,
     pub jwt_secret: String,
+    pub certs_enabled: bool,
+    pub cert_path: String,
+    pub key_path: String,
 }
 
 #[derive(Debug)]
@@ -55,6 +58,11 @@ impl Config {
             .map_err(|_| ConfigError::MissingEnvVar("GOOGLE_USER_INFO_URL".into()))?;
         let jwt_secret = std::env::var("JWT_SECRET")
             .map_err(|_| ConfigError::MissingEnvVar("GOOGLE_USER_INFO_URL".into()))?;
+        let certs_enabled = std::env::var("CERTS_ENABLED")
+            .map(|s| s == "true")
+            .unwrap_or(false);
+        let cert_path = std::env::var("CERT_PATH").unwrap_or("".to_string());
+        let key_path = std::env::var("KEY_PATH").unwrap_or("".to_string());
 
         Ok(Config {
             host,
@@ -67,6 +75,9 @@ impl Config {
             google_token_url,
             google_user_info_url,
             jwt_secret,
+            certs_enabled,
+            cert_path,
+            key_path,
         })
     }
 }

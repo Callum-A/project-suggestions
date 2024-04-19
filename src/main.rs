@@ -6,11 +6,14 @@ pub mod routes;
 pub mod state;
 pub mod util;
 
+use std::net::SocketAddr;
+
 use axum::{
     response::{IntoResponse, Response},
     routing::{delete, get, post, put},
     Router,
 };
+use axum_server::tls_rustls::RustlsConfig;
 use sqlx::postgres::PgPoolOptions;
 use state::AppState;
 use tower_http::services::ServeDir;
@@ -46,7 +49,7 @@ async fn main() {
     let tag_repo = TagRepository::new(pool.clone());
     let jwt_client = JWTClient::new(&config.jwt_secret);
     let app_state = AppState {
-        config,
+        config: config.clone(),
         user_repo,
         project_repo,
         tag_repo,
@@ -93,6 +96,7 @@ async fn main() {
     } else {
         Router::new().route("/", get(root))
     };
+    let certs_enabled = config.certs_enabled;
 
     // Build the full app
     let app = Router::new()
@@ -101,14 +105,29 @@ async fn main() {
         //.route("/", get(root))
         .with_state(app_state.clone());
 
-    let listener = tokio::net::TcpListener::bind(&format!(
-        "{}:{}",
-        app_state.config.host, app_state.config.port
-    ))
-    .await
-    .unwrap();
-    tracing::info!("listening on {}", listener.local_addr().unwrap());
-    axum::serve(listener, app).await.unwrap();
+    if certs_enabled {
+        let tls_config = RustlsConfig::from_pem_file(&config.cert_path, &config.key_path)
+            .await
+            .unwrap();
+        let server_details = &format!("{}:{}", app_state.config.host, app_state.config.port);
+        let addr: SocketAddr = server_details
+            .parse()
+            .expect("Unable to parse socket address");
+        tracing::debug!("listening on {}", addr);
+        axum_server::bind_rustls(addr, tls_config)
+            .serve(app.into_make_service())
+            .await
+            .unwrap();
+    } else {
+        let listener = tokio::net::TcpListener::bind(&format!(
+            "{}:{}",
+            app_state.config.host, app_state.config.port
+        ))
+        .await
+        .unwrap();
+        tracing::info!("listening on {}", listener.local_addr().unwrap());
+        axum::serve(listener, app).await.unwrap();
+    }
 }
 
 async fn root() -> Response {
