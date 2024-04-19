@@ -2,7 +2,7 @@
 FROM node:16 as ui-builder
 WORKDIR /usr/src/app
 COPY ./ui .
-COPY ./ui/.env ./.env.production
+# COPY ./ui/.env ./.env.production
 RUN npm install
 RUN npm run build
 
