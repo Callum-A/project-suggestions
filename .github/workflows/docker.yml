@@ -5,6 +5,9 @@ on:
     branches:
       - 'main'
 
+concurrency:
+  cancel-in-progress: true
+
 jobs:
   docker-amd:
     runs-on: ubuntu-latest
