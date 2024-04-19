@@ -10,6 +10,10 @@ env:
   REACT_APP_GOOGLE_CLIENT_SECRET: ${{ vars.REACT_APP_GOOGLE_CLIENT_SECRET }}
   REACT_APP_GOOGLE_REDIRECT_URI: ${{ vars.REACT_APP_GOOGLE_REDIRECT_URI }}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   docker-amd:
     runs-on: ubuntu-latest
