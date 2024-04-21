@@ -4,8 +4,10 @@ import { devtools, persist } from 'zustand/middleware';
 
 export interface AppState {
   isLoggedIn: boolean;
+  profile: any;
   projects: any[];
   setProjects: (projects: any[]) => void;
+  setProfile: (profile: any) => void;
   login: () => void;
   logout: () => void;
 }
@@ -15,8 +17,10 @@ export const useAppState = create<AppState>()(
     persist(
       (set) => ({
         isLoggedIn: false,
+        profile: null,
         projects: [],
         setProjects: (projects) => set({ projects }),
+        setProfile: (profile) => set({ profile }),
         login: async () => {
           set({ isLoggedIn: true });
         },

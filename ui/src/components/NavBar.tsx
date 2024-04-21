@@ -20,24 +20,31 @@ const GOOGLE_URL = `https://accounts.google.com/o/oauth2/v2/auth?${queryString}`
 function NavBar() {
   const isLoggedIn = useAppState((state) => state.isLoggedIn);
   const logout = useAppState((state) => state.logout);
+  const profile = useAppState((state) => state.profile);
 
   const onClickLogout = () => {
     logout();
   };
 
   return (
-    <Navbar expand="lg" className="bg-body-tertiary">
-      <Navbar.Brand className="ps-4">Project Suggestions</Navbar.Brand>
-      <Navbar.Toggle aria-controls="basic-navbar-nav" />
-      <Navbar.Collapse id="basic-navbar-nav">
+    <Navbar expand='lg' className='bg-body-tertiary'>
+      <Navbar.Brand className='ps-4'>Project Suggestions</Navbar.Brand>
+      <Navbar.Toggle aria-controls='basic-navbar-nav' />
+      <Navbar.Collapse id='basic-navbar-nav'>
         <Nav>
-          <Link to="/" className="nav-link">
+          <Link to='/' className='nav-link'>
             Home
           </Link>
           {isLoggedIn && <Nav.Link onClick={onClickLogout}>Logout</Nav.Link>}
           {!isLoggedIn && <Nav.Link href={GOOGLE_URL}>Login</Nav.Link>}
         </Nav>
       </Navbar.Collapse>
+      <Navbar.Toggle />
+      {profile && (
+        <Navbar.Collapse className='justify-content-end me-4'>
+          <Navbar.Text>Hi, {profile.name}</Navbar.Text>
+        </Navbar.Collapse>
+      )}
     </Navbar>
   );
 }

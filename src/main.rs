@@ -14,6 +14,7 @@ use axum::{
     Router,
 };
 use axum_server::tls_rustls::RustlsConfig;
+use routes::v1::user::get_profile;
 use sqlx::postgres::PgPoolOptions;
 use state::AppState;
 use tower_http::services::ServeDir;
@@ -70,6 +71,11 @@ async fn main() {
         .route("/:public_id", get(get_project_by_public_id))
         .nest("/", project_v1_router_protected);
 
+    // User routes
+    let user_v1_router = Router::new().route("/profile", get(get_profile)).layer(
+        axum::middleware::from_fn_with_state(app_state.clone(), middleware::authenticate),
+    );
+
     // Debug routes
     let debug_v1_router_protected =
         Router::new()
@@ -86,6 +92,7 @@ async fn main() {
     let api_v1_router = Router::new()
         .nest("/project", project_v1_router)
         .nest("/debug", debug_v1_router)
+        .nest("/user", user_v1_router)
         .route("/oauth/authorize/google", get(google_authorize))
         .route("/oauth/callback/google", get(google_callback));
 

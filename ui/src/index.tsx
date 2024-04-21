@@ -2,11 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Home from './Home';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import NavBar from './components/NavBar';
-import { Container } from 'react-bootstrap';
+import Main from './Main';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -14,14 +11,7 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <NavBar />
-      <Container>
-        <Routes>
-          <Route path='/' element={<Home />} />
-        </Routes>
-      </Container>
-    </BrowserRouter>
+    <Main />
   </React.StrictMode>
 );
 

@@ -2,7 +2,9 @@
 /.env
 /.env.production
 /.env.local
+/.env.development
 /dist
+env-storage/
 
 # UI
 ui/node_modules
