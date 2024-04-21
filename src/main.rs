@@ -35,10 +35,10 @@ use crate::{
 #[tokio::main]
 async fn main() {
     dotenv::dotenv().ok();
-    tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::DEBUG)
-        .init();
     let config = Config::from_env().unwrap();
+    let level: tracing::Level = config.log_level.parse().unwrap();
+    tracing_subscriber::fmt().with_max_level(level).init();
+
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect(&config.database_url)

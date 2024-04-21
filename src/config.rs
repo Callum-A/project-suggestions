@@ -18,6 +18,7 @@ pub struct Config {
     pub certs_enabled: bool,
     pub cert_path: String,
     pub key_path: String,
+    pub log_level: String,
 }
 
 #[derive(Debug)]
@@ -63,6 +64,7 @@ impl Config {
             .unwrap_or(false);
         let cert_path = std::env::var("CERT_PATH").unwrap_or("".to_string());
         let key_path = std::env::var("KEY_PATH").unwrap_or("".to_string());
+        let log_level = std::env::var("LOG_LEVEL").unwrap_or("info".to_string());
 
         Ok(Config {
             host,
@@ -78,6 +80,7 @@ impl Config {
             certs_enabled,
             cert_path,
             key_path,
+            log_level,
         })
     }
 }
