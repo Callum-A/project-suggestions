@@ -64,7 +64,10 @@ pub async fn google_callback(
         .await
         .unwrap();
 
-    let response = response.json::<GoogleTokenResponse>().await.unwrap();
+    let raw_str = response.text().await.unwrap();
+    tracing::info!("response={}", raw_str);
+    let response = serde_json::from_str::<GoogleTokenResponse>(&raw_str).unwrap();
+    // let response = response.json::<GoogleTokenResponse>().await.unwrap();
     let token = response.access_token;
 
     let response = reqwest::Client::new()
