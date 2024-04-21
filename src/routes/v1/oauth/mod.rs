@@ -48,9 +48,16 @@ pub async fn google_callback(
     Query(query): Query<GoogleCallbackQuery>,
 ) -> Response {
     let code = query.code;
-    tracing::info!("redirect_uri={}", state.config.google_redirect_uri);
-    let google_redirect_uri: String =
-        url::form_urlencoded::byte_serialize(state.config.google_redirect_uri.as_bytes()).collect();
+    tracing::info!(
+        "redirect_uri={} code={} state={} google_client_id={} google_client_secret={} google_token_url={} google_user_info_url={}",
+        state.config.google_redirect_uri,
+        code,
+        query.state,
+        state.config.google_client_id,
+        state.config.google_client_secret,
+        state.config.google_token_url,
+        state.config.google_user_info_url
+    );
 
     let response = reqwest::Client::new()
         .post(&state.config.google_token_url)
@@ -58,7 +65,7 @@ pub async fn google_callback(
             ("code", code),
             ("client_id", state.config.google_client_id),
             ("client_secret", state.config.google_client_secret),
-            ("redirect_uri", google_redirect_uri),
+            ("redirect_uri", state.config.google_redirect_uri),
             ("grant_type", "authorization_code".to_string()),
         ])
         .send()
