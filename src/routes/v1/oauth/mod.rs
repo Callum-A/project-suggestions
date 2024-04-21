@@ -48,17 +48,6 @@ pub async fn google_callback(
     Query(query): Query<GoogleCallbackQuery>,
 ) -> Response {
     let code = query.code;
-    tracing::info!(
-        "redirect_uri={} code={} state={} google_client_id={} google_client_secret={} google_token_url={} google_user_info_url={}",
-        state.config.google_redirect_uri,
-        code,
-        query.state,
-        state.config.google_client_id,
-        state.config.google_client_secret,
-        state.config.google_token_url,
-        state.config.google_user_info_url
-    );
-
     let response = reqwest::Client::new()
         .post(&state.config.google_token_url)
         .form(&[
@@ -72,10 +61,7 @@ pub async fn google_callback(
         .await
         .unwrap();
 
-    let raw_str = response.text().await.unwrap();
-    tracing::info!("response={}", raw_str);
-    let response = serde_json::from_str::<GoogleTokenResponse>(&raw_str).unwrap();
-    // let response = response.json::<GoogleTokenResponse>().await.unwrap();
+    let response = response.json::<GoogleTokenResponse>().await.unwrap();
     let token = response.access_token;
 
     let response = reqwest::Client::new()
