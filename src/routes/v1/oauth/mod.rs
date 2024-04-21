@@ -48,6 +48,7 @@ pub async fn google_callback(
     Query(query): Query<GoogleCallbackQuery>,
 ) -> Response {
     let code = query.code;
+    tracing::info!("redirect_uri={}", state.config.google_redirect_uri);
     let google_redirect_uri: String =
         url::form_urlencoded::byte_serialize(state.config.google_redirect_uri.as_bytes()).collect();
 
