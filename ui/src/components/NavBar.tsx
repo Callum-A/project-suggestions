@@ -39,7 +39,6 @@ function NavBar() {
           {!isLoggedIn && <Nav.Link href={GOOGLE_URL}>Login</Nav.Link>}
         </Nav>
       </Navbar.Collapse>
-      <Navbar.Toggle />
       {profile && (
         <Navbar.Collapse className='justify-content-end me-4'>
           <Navbar.Text>Hi, {profile.name}</Navbar.Text>
