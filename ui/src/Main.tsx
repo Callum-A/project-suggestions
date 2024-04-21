@@ -5,6 +5,7 @@ import Home from './Home';
 import { useEffect } from 'react';
 import Cookies from 'js-cookie';
 import { useAppState } from './store';
+import EditProject from './pages/EditProject';
 
 function Main() {
   const logout = useAppState((state) => state.logout);
@@ -41,6 +42,7 @@ function Main() {
       <Container>
         <Routes>
           <Route path='/' element={<Home />} />
+          <Route path='/edit/:publicId' element={<EditProject />} />
         </Routes>
       </Container>
     </BrowserRouter>
