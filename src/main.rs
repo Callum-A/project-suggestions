@@ -35,7 +35,7 @@ use crate::{
 
 #[tokio::main]
 async fn main() {
-    dotenv::dotenv().ok();
+    dotenvy::dotenv().ok();
     let config = Config::from_env().unwrap();
     let level: tracing::Level = config.log_level.parse().unwrap();
     tracing_subscriber::fmt().with_max_level(level).init();
